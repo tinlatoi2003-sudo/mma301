@@ -1,0 +1,11 @@
+{
+  "name": "project-mma301-room-management",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev:mobile": "npm --prefix mobile-app run start",
+    "android:mobile": "npm --prefix mobile-app run android",
+    "dev:backend": "npm --prefix backend run dev",
+    "start:backend": "npm --prefix backend run start"
+  }
+}

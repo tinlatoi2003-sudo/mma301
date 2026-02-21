@@ -1,0 +1,9 @@
+node_modules
+.expo
+dist
+build
+.env
+coverage
+*.log
+backend/uploads
+mobile/.expo

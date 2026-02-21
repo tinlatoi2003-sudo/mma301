@@ -1,0 +1,19 @@
+{
+  "expo": {
+    "name": "Room Manager",
+    "slug": "room-manager",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#f7efe5"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "android": {
+      "package": "com.mma301.roommanager"
+    }
+  }
+}
