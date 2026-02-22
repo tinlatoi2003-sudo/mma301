@@ -3,6 +3,7 @@ const User = require("../models/User");
 const createError = require("../utils/createError");
 const createToken = require("../utils/createToken");
 
+
 async function register(req, res, next) {
   try {
     const { fullName, email, password, phone } = req.body;
@@ -100,8 +101,45 @@ function getProfile(req, res) {
   });
 }
 
+async function updateMyProfile(req, res, next) {
+  try {
+    const { fullName, phone, password } = req.body;
+    const updates = {};
+
+    if (fullName !== undefined) updates.fullName = fullName;
+    if (phone !== undefined) updates.phone = phone;
+    if (password) {
+      updates.password = await bcrypt.hash(password, 10);
+    }
+
+    const user = await User.findByIdAndUpdate(req.user._id, updates, {
+      new: true,
+      runValidators: true
+    }).select("-password");
+
+    if (!user) {
+      throw createError(404, "User not found");
+    }
+
+    res.json({
+      success: true,
+      message: "Profile updated successfully",
+      data: {
+        id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        role: user.role,
+        phone: user.phone
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   register,
   login,
-  getProfile
+  getProfile,
+  updateMyProfile
 };

@@ -3,6 +3,9 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
+    "setup": "powershell -ExecutionPolicy Bypass -File ./setup.ps1",
+    "setup:backend": "npm --prefix backend install",
+    "setup:mobile": "npm --prefix mobile-app install",
     "dev:mobile": "npm --prefix mobile-app run start",
     "android:mobile": "npm --prefix mobile-app run android",
     "dev:backend": "npm --prefix backend run dev",

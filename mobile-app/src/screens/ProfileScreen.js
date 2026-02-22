@@ -28,6 +28,13 @@ export default function ProfileScreen({ navigation }) {
           <View style={styles.gap} />
         </>
       )}
+      <View style={styles.gap} />
+      <AppButton
+        label="Chỉnh sửa thông tin"
+        onPress={() => navigation.navigate("EditProfile")}
+        variant="secondary"
+      />
+      <View style={styles.gap} />
       <AppButton label="Đăng xuất" onPress={logout} variant="secondary" />
     </ScreenContainer>
   );

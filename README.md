@@ -1,63 +1,149 @@
-# Project MMA301 - Room Management App
+# MMA301 - Room Management App
 
-Day la bo project cuoi mon React Native theo de tai **ung dung quan ly phong tro**.
-
-## Cong nghe
-
-- Mobile: React Native voi Expo
-- Backend: Node.js + Express
-- Database: MongoDB
-- API: RESTful JSON
+Ung dung quan ly phong tro duoc xay dung cho project cuoi mon React Native.
 
 ## Cau truc thu muc
 
-- `mobile-app`: ung dung React Native
-- `backend`: server Express, MongoDB models, API routes
-- `docs`: tai lieu mo ta de tai va schema database
+- `backend`: Express API + MongoDB
+- `mobile-app`: ung dung React Native Expo
+- `docs`: tai lieu project
+- `mobile-web`: de trong cho mo rong
+- `web-admin`: de trong cho mo rong
 
-## Chuc nang da xay dung
+## Cong nghe su dung
 
-- Dang ky, dang nhap bang JWT
-- Hien thi danh sach phong tu API
+- Mobile: React Native + Expo
+- Backend: Node.js + Express
+- Database: MongoDB Atlas
+- Auth: JWT
+
+## Dieu kien can truoc khi chay
+
+- Node.js 18 hoac moi hon
+- npm
+- Android Studio
+- Android SDK + emulator
+- MongoDB Atlas cluster
+
+## Setup nhanh
+
+Tu thu muc goc project:
+
+```powershell
+npm run setup
+```
+
+Script nay se:
+
+- cai dependencies cho `backend`
+- cai dependencies cho `mobile-app`
+- tao file `backend/.env` neu chua co
+
+## Cau hinh backend
+
+Mo file [backend/.env](C:\Users\Admin\OneDrive\Desktop\MMA301\projectMma301\backend\.env) va cap nhat:
+
+```env
+PORT=5000
+MONGO_URI=mongodb+srv://your_atlas_username:your_atlas_password@your-cluster.mongodb.net/room-management?retryWrites=true&w=majority&appName=your-cluster
+JWT_SECRET=replace_with_a_secure_secret_key
+```
+
+Neu dung MongoDB Atlas:
+
+1. Tao database user trong `Database Access`
+2. Cap quyen `readWrite` cho database `room-management` hoac `readWriteAnyDatabase`
+3. Trong `Network Access`, them IP hien tai hoac `0.0.0.0/0` de test
+
+## Nap du lieu mau
+
+Chay trong [backend](C:\Users\Admin\OneDrive\Desktop\MMA301\projectMma301\backend):
+
+```powershell
+npm run seed
+```
+
+Tai khoan admin mau:
+
+- Email: `admin@gmail.com`
+- Mat khau: `123456`
+
+## Chay backend
+
+Trong [backend](C:\Users\Admin\OneDrive\Desktop\MMA301\projectMma301\backend):
+
+```powershell
+npm run dev
+```
+
+Neu chay thanh cong, terminal se hien:
+
+```text
+Connected to MongoDB
+Server is running on port 5000
+```
+
+## Chay mobile tren Android Studio
+
+1. Mo Android Studio
+2. Vao `Device Manager`
+3. Bat emulator Android
+4. Trong [mobile-app](C:\Users\Admin\OneDrive\Desktop\MMA301\projectMma301\mobile-app), chay:
+
+```powershell
+npm run android
+```
+
+App dang su dung API URL:
+
+```js
+http://10.0.2.2:5000/api
+```
+
+Dia chi nay dung cho Android emulator truy cap backend chay tren may tinh.
+
+## Cac script quan trong
+
+Tu thu muc goc:
+
+```powershell
+npm run setup
+npm run dev:backend
+npm run dev:mobile
+npm run android:mobile
+```
+
+Hoac chay rieng tung phan:
+
+Trong [backend](C:\Users\Admin\OneDrive\Desktop\MMA301\projectMma301\backend):
+
+```powershell
+npm install
+npm run seed
+npm run dev
+```
+
+Trong [mobile-app](C:\Users\Admin\OneDrive\Desktop\MMA301\projectMma301\mobile-app):
+
+```powershell
+npm install
+npm run android
+```
+
+## Chuc nang hien co
+
+- Dang ky, dang nhap
+- Xem danh sach phong
 - Xem chi tiet phong
 - Dat lich xem phong
-- Xem lich hen cua nguoi dung
-- Dashboard thong ke co ban
+- Theo doi lich hen
+- Admin quan ly phong
+- Admin quan ly user
+- Admin duyet lich hen
+- Dashboard thong ke
 
-## API chinh
+## Luu y khi demo
 
-- `POST /api/auth/register`
-- `POST /api/auth/login`
-- `GET /api/auth/me`
-- `GET /api/rooms`
-- `GET /api/rooms/:id`
-- `POST /api/bookings`
-- `GET /api/bookings/mine`
-- `GET /api/dashboard/summary`
-
-## Cach chay backend
-
-1. Vao thu muc `backend`
-2. Tao file `.env` tu `.env.example`
-3. Cai package bang `npm install`
-4. Chay `npm run seed` de tao du lieu mau
-5. Chay `npm run dev`
-
-## Cach chay mobile
-
-1. Vao thu muc `mobile-app`
-2. Cai package bang `npm install`
-3. Sua `API_URL` trong `mobile-app/src/services/api.js` thanh IP may backend
-4. Chay `npm start`
-5. Mo Expo Go tren Android de test
-
-## Tai khoan demo
-
-- Admin: dang ky bang email `admin@gmail.com` se duoc gan role `admin`
-- User thuong: dang ky bang email bat ky khac
-
-## Ghi chu nop bai
-
-- Ban co san 5+ man hinh va co ket noi backend/database
-- Neu muon dat muc diem cao hon, co the them web admin CRUD rieng
-- Nen quay video demo cac luong: dang ky, dang nhap, xem phong, dat lich, xem dashboard
+- Chay backend truoc khi mo mobile
+- Neu Atlas khong ket noi duoc, kiem tra `Database Access`, `Network Access`, DNS va firewall
+- Neu emulator khong mo app, dam bao `adb` nhan thiet bi va Android Studio da bat emulator

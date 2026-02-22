@@ -2,7 +2,7 @@ import React from "react";
 import { StyleSheet, Text, TextInput, View } from "react-native";
 import { colors } from "../constants/theme";
 
-export default function AppInput({ label, ...props }) {
+export default function AppInput({ label, value, ...props }) {
   return (
     <View style={styles.wrapper}>
       <Text style={styles.label}>{label}</Text>
@@ -11,6 +11,10 @@ export default function AppInput({ label, ...props }) {
         style={styles.input}
         allowFontScaling={true}
         editable={true}
+        autoCorrect={false}
+        autoComplete="off"
+        spellCheck={false}
+        defaultValue={value}
         {...props}
       />
     </View>

@@ -128,5 +128,13 @@ export const api = {
       headers: {
         Authorization: `Bearer ${token}`
       }
+    }),
+  updateProfile: (token, payload) =>
+    request("/auth/me", {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify(payload)
     })
 };

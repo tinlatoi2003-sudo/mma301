@@ -56,6 +56,14 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
+  const updateUser = async (payload) => {
+    const response = await api.updateProfile(token, payload);
+    const updatedUser = response.data;
+    setUser(updatedUser);
+    await AsyncStorage.setItem("user", JSON.stringify(updatedUser));
+    return updatedUser;
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -64,7 +72,8 @@ export function AuthProvider({ children }) {
         isLoading,
         login,
         register,
-        logout
+        logout,
+        updateUser
       }}
     >
       {children}
@@ -75,3 +84,4 @@ export function AuthProvider({ children }) {
 export function useAuth() {
   return useContext(AuthContext);
 }
+

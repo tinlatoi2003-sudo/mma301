@@ -14,6 +14,7 @@ import ProfileScreen from "../screens/ProfileScreen";
 import AdminRoomsScreen from "../screens/AdminRoomsScreen";
 import AdminUsersScreen from "../screens/AdminUsersScreen";
 import PendingBookingsScreen from "../screens/PendingBookingsScreen";
+import EditProfileScreen from "../screens/EditProfileScreen";
 import { colors } from "../constants/theme";
 
 const Stack = createNativeStackNavigator();
@@ -110,6 +111,11 @@ export default function RootNavigator() {
             name="RoomDetail"
             component={RoomDetailScreen}
             options={{ title: "Chi tiết phòng" }}
+          />
+          <Stack.Screen
+            name="EditProfile"
+            component={EditProfileScreen}
+            options={{ title: "Chỉnh sửa thông tin" }}
           />
           {user?.role === "admin" && (
             <>

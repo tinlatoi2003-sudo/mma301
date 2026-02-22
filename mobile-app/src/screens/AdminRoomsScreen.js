@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import {
   Alert,
   FlatList,
@@ -38,10 +38,12 @@ export default function AdminRoomsScreen() {
   const [rooms, setRooms] = useState([]);
   const [visible, setVisible] = useState(false);
   const [editingRoom, setEditingRoom] = useState(null);
-  const [form, setForm] = useState(emptyForm);
+  // dùng useRef thay vì useState để tránh re-render khi gõ → fix tiếng Việt
+  const formRef = useRef({ ...emptyForm });
+  const [modalKey, setModalKey] = useState(0); // để force re-mount AppInput khi mở modal mới
 
   const updateForm = useCallback((key, value) => {
-    setForm((prev) => ({ ...prev, [key]: value }));
+    formRef.current[key] = value;
   }, []);
 
   const loadRooms = async () => {
@@ -61,40 +63,43 @@ export default function AdminRoomsScreen() {
 
   const openCreateModal = () => {
     setEditingRoom(null);
-    setForm(emptyForm);
+    formRef.current = { ...emptyForm };
+    setModalKey((k) => k + 1);
     setVisible(true);
   };
 
   const openEditModal = (room) => {
     setEditingRoom(room);
-    setForm({
+    formRef.current = {
       title: room.title,
       address: room.address,
       price: String(room.price),
       area: String(room.area),
       status: room.status,
-      imageUrl: room.imageUrl,
-      description: room.description,
+      imageUrl: room.imageUrl || "",
+      description: room.description || "",
       facilities: room.facilities.join(", "),
-      managerName: room.managerName,
-      managerPhone: room.managerPhone
-    });
+      managerName: room.managerName || "",
+      managerPhone: room.managerPhone || ""
+    };
+    setModalKey((k) => k + 1);
     setVisible(true);
   };
 
   const handleSubmit = async () => {
+    const f = formRef.current;
     try {
-      if (!form.title.trim() || !form.address.trim() || !form.price.trim() || !form.area.trim()) {
+      if (!f.title.trim() || !f.address.trim() || !f.price.trim() || !f.area.trim()) {
         Alert.alert("Thiếu thông tin", "Hãy nhập tên phòng, địa chỉ, giá phòng và diện tích");
         return;
       }
 
       const payload = {
-        ...form,
-        price: Number(form.price),
-        area: Number(form.area),
-        imageUrl: form.imageUrl.trim() || defaultRoomImage,
-        facilities: form.facilities
+        ...f,
+        price: Number(f.price),
+        area: Number(f.area),
+        imageUrl: f.imageUrl.trim() || defaultRoomImage,
+        facilities: f.facilities
           .split(",")
           .map((item) => item.trim())
           .filter(Boolean)
@@ -113,7 +118,7 @@ export default function AdminRoomsScreen() {
 
       setVisible(false);
       setEditingRoom(null);
-      setForm(emptyForm);
+      formRef.current = { ...emptyForm };
       loadRooms();
     } catch (error) {
       Alert.alert("Không lưu được phòng", error.message);
@@ -173,60 +178,70 @@ export default function AdminRoomsScreen() {
           <ScrollView showsVerticalScrollIndicator={false}>
             <Text style={styles.heading}>{editingRoom ? "Sửa phòng" : "Thêm phòng"}</Text>
             <AppInput
+              key={`title-${modalKey}`}
               label="Tên phòng"
-              value={form.title}
-              onChangeText={(value) => updateForm("title", value)}
+              value={formRef.current.title}
+              onChangeText={(v) => updateForm("title", v)}
             />
             <AppInput
+              key={`address-${modalKey}`}
               label="Địa chỉ"
-              value={form.address}
-              onChangeText={(value) => updateForm("address", value)}
+              value={formRef.current.address}
+              onChangeText={(v) => updateForm("address", v)}
             />
             <AppInput
+              key={`price-${modalKey}`}
               label="Giá phòng"
-              value={form.price}
-              onChangeText={(value) => updateForm("price", value)}
+              value={formRef.current.price}
+              onChangeText={(v) => updateForm("price", v)}
               keyboardType="numeric"
             />
             <AppInput
+              key={`area-${modalKey}`}
               label="Diện tích"
-              value={form.area}
-              onChangeText={(value) => updateForm("area", value)}
+              value={formRef.current.area}
+              onChangeText={(v) => updateForm("area", v)}
               keyboardType="numeric"
             />
             <AppInput
+              key={`status-${modalKey}`}
               label="Trạng thái"
-              value={form.status}
-              onChangeText={(value) => updateForm("status", value)}
+              value={formRef.current.status}
+              onChangeText={(v) => updateForm("status", v)}
             />
             <AppInput
+              key={`imageUrl-${modalKey}`}
               label="Image URL"
-              value={form.imageUrl}
-              onChangeText={(value) => updateForm("imageUrl", value)}
+              value={formRef.current.imageUrl}
+              onChangeText={(v) => updateForm("imageUrl", v)}
             />
             <AppInput
+              key={`description-${modalKey}`}
               label="Mô tả"
-              value={form.description}
-              onChangeText={(value) => updateForm("description", value)}
+              value={formRef.current.description}
+              onChangeText={(v) => updateForm("description", v)}
             />
             <AppInput
+              key={`facilities-${modalKey}`}
               label="Tiện ích"
-              value={form.facilities}
-              onChangeText={(value) => updateForm("facilities", value)}
+              value={formRef.current.facilities}
+              onChangeText={(v) => updateForm("facilities", v)}
             />
             <AppInput
+              key={`managerName-${modalKey}`}
               label="Người quản lý"
-              value={form.managerName}
-              onChangeText={(value) => updateForm("managerName", value)}
+              value={formRef.current.managerName}
+              onChangeText={(v) => updateForm("managerName", v)}
             />
             <AppInput
+              key={`managerPhone-${modalKey}`}
               label="SDT quản lý"
-              value={form.managerPhone}
-              onChangeText={(value) => updateForm("managerPhone", value)}
+              value={formRef.current.managerPhone}
+              onChangeText={(v) => updateForm("managerPhone", v)}
             />
-            <AppButton label="Luu phong" onPress={handleSubmit} />
+            <AppButton label="Lưu phòng" onPress={handleSubmit} />
             <View style={styles.modalGap} />
-            <AppButton label="Dong" onPress={() => setVisible(false)} variant="secondary" />
+            <AppButton label="Đóng" onPress={() => setVisible(false)} variant="secondary" />
           </ScrollView>
         </ScreenContainer>
       </Modal>
