@@ -5,6 +5,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
+    "newArchEnabled": false,
     "splash": {
       "resizeMode": "contain",
       "backgroundColor": "#f7efe5"
@@ -13,7 +14,13 @@
       "**/*"
     ],
     "android": {
-      "package": "com.mma301.roommanager"
+      "package": "com.mma301.roommanager",
+      "versionCode": 1
+    },
+    "extra": {
+      "eas": {
+        "projectId": "b1f6f971-2c1d-4586-b060-aade7c7924e9"
+      }
     }
   }
 }

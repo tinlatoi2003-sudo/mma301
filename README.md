@@ -130,6 +130,42 @@ npm install
 npm run android
 ```
 
+## Build APK de nop APKPure
+
+Trong [mobile-app](C:\Users\Admin\OneDrive\Desktop\MMA301\projectMma301\mobile-app):
+
+```powershell
+npm install -g eas-cli
+eas login
+eas build:configure
+npm run build:apk
+```
+
+Xem them tai lieu tai [docs/apkpure-deploy-guide.md](C:\Users\Admin\OneDrive\Desktop\MMA301\projectMma301\docs\apkpure-deploy-guide.md).
+
+## Deploy backend len Vercel
+
+Backend da duoc chuan bi san cho Vercel tai:
+
+- [backend/api/index.js](C:\Users\Admin\OneDrive\Desktop\MMA301\projectMma301\backend\api\index.js)
+- [backend/vercel.json](C:\Users\Admin\OneDrive\Desktop\MMA301\projectMma301\backend\vercel.json)
+
+Khi tao project tren Vercel:
+
+1. Import repository GitHub
+2. Chon `Root Directory` la `backend`
+3. Framework Preset de `Other`
+4. Them environment variables:
+   - `MONGO_URI`
+   - `JWT_SECRET`
+5. Deploy
+
+Sau khi deploy xong, API se co dang:
+
+```text
+https://your-project-name.vercel.app/api/health
+```
+
 ## Chuc nang hien co
 
 - Dang ky, dang nhap
