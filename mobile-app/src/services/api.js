@@ -1,4 +1,4 @@
-const API_URL = "http://10.0.2.2:5000/api";
+const API_URL = "https://mma301.vercel.app/api";
 
 async function request(path, options = {}) {
   const response = await fetch(`${API_URL}${path}`, {
