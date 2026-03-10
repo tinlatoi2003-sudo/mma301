@@ -17,7 +17,7 @@ async function getUsers(_req, res, next) {
 
 async function createUser(req, res, next) {
   try {
-    const { fullName, email, password, phone, role } = req.body;
+    const { fullName, email, password, phone, role, chatEnabled } = req.body;
 
     if (!fullName || !email || !password) {
       throw createError(400, "fullName, email and password are required");
@@ -34,7 +34,8 @@ async function createUser(req, res, next) {
       email,
       password: hashedPassword,
       phone,
-      role: role || "user"
+      role: role || "user",
+      chatEnabled: chatEnabled !== undefined ? Boolean(chatEnabled) : false
     });
 
     res.status(201).json({
@@ -45,7 +46,8 @@ async function createUser(req, res, next) {
         fullName: user.fullName,
         email: user.email,
         role: user.role,
-        phone: user.phone
+        phone: user.phone,
+        chatEnabled: user.chatEnabled
       }
     });
   } catch (error) {
@@ -55,11 +57,12 @@ async function createUser(req, res, next) {
 
 async function updateUser(req, res, next) {
   try {
-    const { fullName, phone, role, password } = req.body;
+    const { fullName, phone, role, password, chatEnabled } = req.body;
     const updates = {
       fullName,
       phone,
-      role
+      role,
+      chatEnabled: chatEnabled !== undefined ? Boolean(chatEnabled) : undefined
     };
 
     if (password) {

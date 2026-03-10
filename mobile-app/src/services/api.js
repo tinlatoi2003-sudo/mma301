@@ -9,10 +9,31 @@ async function request(path, options = {}) {
     }
   });
 
-  const result = await response.json();
+  const raw = await response.text();
+  let result = null;
+
+  try {
+    result = raw ? JSON.parse(raw) : null;
+  } catch (_error) {
+    result = null;
+  }
 
   if (!response.ok) {
-    throw new Error(result.message || "Request failed");
+    if (result?.message) {
+      throw new Error(result.message);
+    }
+
+    if (raw?.trim().startsWith("<")) {
+      throw new Error(
+        `API ${response.status}: Endpoint khong ton tai hoac backend chua deploy ban moi`
+      );
+    }
+
+    throw new Error(`Request failed (${response.status})`);
+  }
+
+  if (!result) {
+    throw new Error("API tra ve du lieu khong hop le");
   }
 
   return result;
@@ -128,6 +149,26 @@ export const api = {
       headers: {
         Authorization: `Bearer ${token}`
       }
+    }),
+  getConversations: (token) =>
+    request("/chat/conversations", {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }),
+  getConversationMessages: (token, conversationId) =>
+    request(`/chat/conversations/${conversationId}/messages`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }),
+  sendMessage: (token, conversationId, text) =>
+    request(`/chat/conversations/${conversationId}/messages`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ text })
     }),
   updateProfile: (token, payload) =>
     request("/auth/me", {

@@ -15,12 +15,16 @@ import AdminRoomsScreen from "../screens/AdminRoomsScreen";
 import AdminUsersScreen from "../screens/AdminUsersScreen";
 import PendingBookingsScreen from "../screens/PendingBookingsScreen";
 import EditProfileScreen from "../screens/EditProfileScreen";
+import ChatListScreen from "../screens/ChatListScreen";
+import ChatDetailScreen from "../screens/ChatDetailScreen";
 import { colors } from "../constants/theme";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-function MainTabs({ userRole }) {
+function MainTabs({ user }) {
+  const canAccessChat = user?.role === "admin" || user?.chatEnabled;
+
   return (
     <Tab.Navigator
       screenOptions={{
@@ -33,47 +37,63 @@ function MainTabs({ userRole }) {
         }
       }}
     >
-      <Tab.Screen 
-        name="TrangChu" 
-        component={HomeScreen} 
-        options={{ 
-          title: "Phòng",
+      <Tab.Screen
+        name="TrangChu"
+        component={HomeScreen}
+        options={{
+          title: "Phong",
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="home" size={size} color={color} />
           )
-        }} 
+        }}
       />
-      <Tab.Screen 
-        name="LichHen" 
-        component={BookingScreen} 
-        options={{ 
-          title: "Đặt lịch",
+      <Tab.Screen
+        name="LichHen"
+        component={BookingScreen}
+        options={{
+          title: "Lich hen",
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="calendar" size={size} color={color} />
           )
-        }} 
+        }}
       />
-      {userRole === "admin" && (
-        <Tab.Screen 
-          name="ThongKe" 
-          component={DashboardScreen} 
-          options={{ 
-            title: "Thống kê",
+      {canAccessChat && (
+        <Tab.Screen
+          name="Chat"
+          component={ChatListScreen}
+          options={{
+            title: "Chat",
+            tabBarIcon: ({ color, size }) => (
+              <MaterialCommunityIcons
+                name="chat-processing"
+                size={size}
+                color={color}
+              />
+            )
+          }}
+        />
+      )}
+      {user?.role === "admin" && (
+        <Tab.Screen
+          name="ThongKe"
+          component={DashboardScreen}
+          options={{
+            title: "Thong ke",
             tabBarIcon: ({ color, size }) => (
               <MaterialCommunityIcons name="chart-bar" size={size} color={color} />
             )
-          }} 
+          }}
         />
       )}
-      <Tab.Screen 
-        name="TaiKhoan" 
-        component={ProfileScreen} 
-        options={{ 
-          title: "Tài khoản",
+      <Tab.Screen
+        name="TaiKhoan"
+        component={ProfileScreen}
+        options={{
+          title: "Tai khoan",
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="account" size={size} color={color} />
           )
-        }} 
+        }}
       />
     </Tab.Navigator>
   );
@@ -104,35 +124,40 @@ export default function RootNavigator() {
         <>
           <Stack.Screen
             name="MainTabs"
-            children={() => <MainTabs userRole={user?.role} />}
+            children={() => <MainTabs user={user} />}
             options={{ headerShown: false }}
           />
           <Stack.Screen
             name="RoomDetail"
             component={RoomDetailScreen}
-            options={{ title: "Chi tiết phòng" }}
+            options={{ title: "Chi tiet phong" }}
           />
           <Stack.Screen
             name="EditProfile"
             component={EditProfileScreen}
-            options={{ title: "Chỉnh sửa thông tin" }}
+            options={{ title: "Chinh sua thong tin" }}
+          />
+          <Stack.Screen
+            name="ChatDetail"
+            component={ChatDetailScreen}
+            options={{ title: "Tro chuyen" }}
           />
           {user?.role === "admin" && (
             <>
               <Stack.Screen
                 name="AdminRooms"
                 component={AdminRoomsScreen}
-                options={{ title: "Quản lý phòng" }}
+                options={{ title: "Quan ly phong" }}
               />
               <Stack.Screen
                 name="AdminUsers"
                 component={AdminUsersScreen}
-                options={{ title: "Quản lý user" }}
+                options={{ title: "Quan ly user" }}
               />
               <Stack.Screen
                 name="PendingBookings"
                 component={PendingBookingsScreen}
-                options={{ title: "Chờ duyệt" }}
+                options={{ title: "Cho duyet" }}
               />
             </>
           )}
@@ -142,12 +167,12 @@ export default function RootNavigator() {
           <Stack.Screen
             name="Login"
             component={LoginScreen}
-            options={{ title: "Đăng nhập" }}
+            options={{ title: "Dang nhap" }}
           />
           <Stack.Screen
             name="Register"
             component={RegisterScreen}
-            options={{ title: "Đăng ký" }}
+            options={{ title: "Dang ky" }}
           />
         </>
       )}

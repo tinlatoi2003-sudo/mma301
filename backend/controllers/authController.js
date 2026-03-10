@@ -25,7 +25,8 @@ async function register(req, res, next) {
       email: normalizedEmail,
       password: hashedPassword,
       phone,
-      role
+      role,
+      chatEnabled: role === "admin"
     });
 
     const token = createToken(user);
@@ -40,7 +41,8 @@ async function register(req, res, next) {
           fullName: user.fullName,
           email: user.email,
           role: user.role,
-          phone: user.phone
+          phone: user.phone,
+          chatEnabled: user.chatEnabled
         }
       }
     });
@@ -85,7 +87,8 @@ async function login(req, res, next) {
           fullName: user.fullName,
           email: user.email,
           role: user.role,
-          phone: user.phone
+          phone: user.phone,
+          chatEnabled: user.chatEnabled
         }
       }
     });
@@ -103,11 +106,14 @@ function getProfile(req, res) {
 
 async function updateMyProfile(req, res, next) {
   try {
-    const { fullName, phone, password } = req.body;
+    const { fullName, phone, password, chatEnabled } = req.body;
     const updates = {};
 
     if (fullName !== undefined) updates.fullName = fullName;
     if (phone !== undefined) updates.phone = phone;
+    if (chatEnabled !== undefined && req.user.role !== "admin") {
+      updates.chatEnabled = Boolean(chatEnabled);
+    }
     if (password) {
       updates.password = await bcrypt.hash(password, 10);
     }
@@ -129,7 +135,8 @@ async function updateMyProfile(req, res, next) {
         fullName: user.fullName,
         email: user.email,
         role: user.role,
-        phone: user.phone
+        phone: user.phone,
+        chatEnabled: user.chatEnabled
       }
     });
   } catch (error) {
