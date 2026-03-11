@@ -46,22 +46,19 @@ async function getConversations(req, res, next) {
     let conversations = [];
 
     if (req.user.role === "admin") {
-      const enabledUsers = await User.find({
-        role: "user",
-        chatEnabled: true
-      }).select("_id");
+      const users = await User.find({ role: "user" }).select("_id");
 
-      if (enabledUsers.length > 0) {
+      if (users.length > 0) {
         await Conversation.bulkWrite(
-          enabledUsers.map((enabledUser) => ({
+          users.map((chatUser) => ({
             updateOne: {
               filter: {
-                customer: enabledUser._id,
+                customer: chatUser._id,
                 admin: req.user._id
               },
               update: {
                 $setOnInsert: {
-                  customer: enabledUser._id,
+                  customer: chatUser._id,
                   admin: req.user._id
                 }
               },
@@ -77,13 +74,6 @@ async function getConversations(req, res, next) {
         .populate("lastSender", "fullName role")
         .sort({ lastMessageAt: -1, updatedAt: -1 });
     } else {
-      if (!req.user.chatEnabled) {
-        return res.json({
-          success: true,
-          data: []
-        });
-      }
-
       const conversation = await ensureConversationForUser(req.user._id);
       conversations = [conversation];
     }
@@ -99,10 +89,6 @@ async function getConversations(req, res, next) {
 
 async function getMessages(req, res, next) {
   try {
-    if (req.user.role !== "admin" && !req.user.chatEnabled) {
-      throw createError(403, "Chat is disabled for this account");
-    }
-
     const conversation = await Conversation.findById(req.params.id)
       .populate("customer", "fullName email phone role")
       .populate("admin", "fullName email phone role");
@@ -133,10 +119,6 @@ async function getMessages(req, res, next) {
 
 async function createMessage(req, res, next) {
   try {
-    if (req.user.role !== "admin" && !req.user.chatEnabled) {
-      throw createError(403, "Chat is disabled for this account");
-    }
-
     const { text } = req.body;
 
     if (!text || !text.trim()) {

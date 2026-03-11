@@ -23,8 +23,6 @@ const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 function MainTabs({ user }) {
-  const canAccessChat = user?.role === "admin" || user?.chatEnabled;
-
   return (
     <Tab.Navigator
       screenOptions={{
@@ -57,22 +55,20 @@ function MainTabs({ user }) {
           )
         }}
       />
-      {canAccessChat && (
-        <Tab.Screen
-          name="Chat"
-          component={ChatListScreen}
-          options={{
-            title: "Chat",
-            tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons
-                name="chat-processing"
-                size={size}
-                color={color}
-              />
-            )
-          }}
-        />
-      )}
+      <Tab.Screen
+        name="Chat"
+        component={ChatListScreen}
+        options={{
+          title: "Chat",
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons
+              name="chat-processing"
+              size={size}
+              color={color}
+            />
+          )
+        }}
+      />
       {user?.role === "admin" && (
         <Tab.Screen
           name="ThongKe"

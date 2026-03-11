@@ -5,7 +5,6 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
-  Switch,
   Text,
   TextInput,
   View
@@ -22,7 +21,6 @@ export default function EditProfileScreen({ navigation }) {
   const [phone, setPhone] = useState(user?.phone || "");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [chatEnabled, setChatEnabled] = useState(Boolean(user?.chatEnabled));
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -42,7 +40,6 @@ export default function EditProfileScreen({ navigation }) {
     const payload = { fullName: fullName.trim() };
     if (phone.trim()) payload.phone = phone.trim();
     if (newPassword) payload.password = newPassword;
-    if (user?.role !== "admin") payload.chatEnabled = chatEnabled;
 
     try {
       setLoading(true);
@@ -90,23 +87,6 @@ export default function EditProfileScreen({ navigation }) {
             <View style={styles.readonlyField}>
               <Text style={styles.readonlyText}>{user?.email}</Text>
             </View>
-
-            {user?.role !== "admin" && (
-              <View style={styles.switchRow}>
-                <View style={styles.switchCopy}>
-                  <Text style={styles.switchTitle}>Bat chat voi admin</Text>
-                  <Text style={styles.switchHint}>
-                    Khi bat, ban se thay kenh chat voi admin.
-                  </Text>
-                </View>
-                <Switch
-                  value={chatEnabled}
-                  onValueChange={setChatEnabled}
-                  trackColor={{ false: "#d6d6d6", true: colors.primary }}
-                  thumbColor={colors.white}
-                />
-              </View>
-            )}
           </View>
 
           <View style={styles.card}>
@@ -203,31 +183,6 @@ const styles = StyleSheet.create({
   readonlyText: {
     color: colors.muted,
     fontSize: 15
-  },
-  switchRow: {
-    marginTop: 14,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    backgroundColor: colors.white,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.border,
-    paddingHorizontal: 12,
-    paddingVertical: 10
-  },
-  switchCopy: {
-    flex: 1,
-    paddingRight: 10
-  },
-  switchTitle: {
-    color: colors.secondary,
-    fontWeight: "700"
-  },
-  switchHint: {
-    color: colors.muted,
-    marginTop: 2,
-    fontSize: 12
   },
   gap: {
     height: 12

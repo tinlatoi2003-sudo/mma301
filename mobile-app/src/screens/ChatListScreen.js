@@ -11,7 +11,6 @@ import {
 } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import ScreenContainer from "../components/ScreenContainer";
-import AppButton from "../components/AppButton";
 import { useAuth } from "../context/AuthContext";
 import { api } from "../services/api";
 import { colors } from "../constants/theme";
@@ -51,37 +50,14 @@ export default function ChatListScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      if (user?.role !== "admin" && !user?.chatEnabled) {
-        setConversations([]);
-        setLoading(false);
-        return;
-      }
-
       loadConversations();
-    }, [token, user?.role, user?.chatEnabled])
+    }, [token])
   );
 
   if (loading) {
     return (
       <ScreenContainer>
         <ActivityIndicator size="large" color={colors.primary} />
-      </ScreenContainer>
-    );
-  }
-
-  if (user?.role !== "admin" && !user?.chatEnabled) {
-    return (
-      <ScreenContainer>
-        <View style={styles.emptyWrap}>
-          <Text style={styles.empty}>
-            Ban chua bat chat voi admin. Vao Chinh sua thong tin de bat chat.
-          </Text>
-          <AppButton
-            label="Bat chat ngay"
-            onPress={() => navigation.navigate("EditProfile")}
-            style={styles.enableButton}
-          />
-        </View>
       </ScreenContainer>
     );
   }
@@ -184,9 +160,6 @@ const styles = StyleSheet.create({
   },
   emptyWrap: {
     paddingTop: 30
-  },
-  enableButton: {
-    marginTop: 14
   },
   empty: {
     color: colors.muted,
