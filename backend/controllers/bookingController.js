@@ -91,9 +91,54 @@ async function updateBookingStatus(req, res, next) {
   }
 }
 
+async function payBookingSandbox(req, res, next) {
+  try {
+    const booking = await Booking.findById(req.params.id).populate("room");
+
+    if (!booking) {
+      throw createError(404, "Booking not found");
+    }
+
+    const isOwner = String(booking.user) === String(req.user._id);
+    if (!isOwner && req.user.role !== "admin") {
+      throw createError(403, "You do not have access to pay this booking");
+    }
+
+    if (booking.paymentStatus === "paid") {
+      return res.json({
+        success: true,
+        message: "Booking is already paid",
+        data: booking
+      });
+    }
+
+    const transactionId = `SBX-${Date.now()}-${Math.floor(Math.random() * 100000)}`;
+
+    booking.paymentStatus = "paid";
+    booking.paymentMethod = "sandbox";
+    booking.paymentTransactionId = transactionId;
+    booking.paidAt = new Date();
+
+    if (booking.status === "pending") {
+      booking.status = "confirmed";
+    }
+
+    await booking.save();
+
+    res.json({
+      success: true,
+      message: "Sandbox payment successful",
+      data: booking
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   createBooking,
   getMyBookings,
   getAllBookings,
-  updateBookingStatus
+  updateBookingStatus,
+  payBookingSandbox
 };

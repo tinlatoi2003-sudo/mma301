@@ -19,7 +19,7 @@ export default function BookingScreen() {
           : await api.getMyBookings(token);
       setBookings(response.data);
     } catch (error) {
-      Alert.alert("Không tải được lịch hẹn", error.message);
+      Alert.alert("Khong tai duoc lich hen", error.message);
     } finally {
       setLoading(false);
     }
@@ -42,7 +42,7 @@ export default function BookingScreen() {
   return (
     <ScreenContainer>
       <Text style={styles.heading}>
-        {user?.role === "admin" ? "Người đặt phòng" : "Lịch hẹn của tôi"}
+        {user?.role === "admin" ? "Nguoi dat phong" : "Lich hen cua toi"}
       </Text>
       <FlatList
         data={bookings}
@@ -52,21 +52,25 @@ export default function BookingScreen() {
             <Text style={styles.title}>{item.room?.title}</Text>
             {user?.role === "admin" && (
               <>
-                <Text style={styles.meta}>Khách hàng: {item.user?.fullName}</Text>
+                <Text style={styles.meta}>Khach hang: {item.user?.fullName}</Text>
                 <Text style={styles.meta}>Email: {item.user?.email}</Text>
-                <Text style={styles.meta}>Số điện thoại: {item.user?.phone || "Chưa có"}</Text>
+                <Text style={styles.meta}>So dien thoai: {item.user?.phone || "Chua co"}</Text>
               </>
             )}
-            <Text style={styles.meta}>Ngày xem phòng: {item.visitDate}</Text>
-            <Text style={styles.meta}>Trạng thái: {item.status}</Text>
+            <Text style={styles.meta}>Ngay xem phong: {item.visitDate}</Text>
+            <Text style={styles.meta}>Trang thai: {item.status}</Text>
+            <Text style={styles.meta}>
+              Thanh toan: {item.paymentStatus || "unpaid"} ({item.paymentMethod || "sandbox"})
+            </Text>
+            {item.paymentTransactionId ? <Text style={styles.meta}>Ma GD: {item.paymentTransactionId}</Text> : null}
             <Text style={styles.note}>{item.note}</Text>
           </View>
         )}
         ListEmptyComponent={
           <Text style={styles.empty}>
             {user?.role === "admin"
-              ? "Chưa có người đặt phòng nào."
-              : "Bạn chưa đặt lịch nào."}
+              ? "Chua co nguoi dat phong nao."
+              : "Ban chua dat lich nao."}
           </Text>
         }
       />

@@ -66,6 +66,13 @@ export const api = {
       },
       body: JSON.stringify(payload)
     }),
+  payBookingSandbox: (token, bookingId) =>
+    request(`/bookings/${bookingId}/pay-sandbox`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }),
   getMyBookings: (token) =>
     request("/bookings/mine", {
       headers: {

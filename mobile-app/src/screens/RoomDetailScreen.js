@@ -27,7 +27,7 @@ export default function RoomDetailScreen({ route, navigation }) {
         const response = await api.getRoomDetail(roomId);
         setRoom(response.data);
       } catch (error) {
-        Alert.alert("Không tải được chi tiết phòng", error.message);
+        Alert.alert("Khong tai duoc chi tiet phong", error.message);
       } finally {
         setLoading(false);
       }
@@ -41,22 +41,36 @@ export default function RoomDetailScreen({ route, navigation }) {
       const bookingRoomId = room?._id || roomId;
 
       if (!bookingRoomId) {
-        Alert.alert("Đặt lịch thất bại", "Không tìm thấy mã phòng để đặt lịch");
+        Alert.alert("Dat lich that bai", "Khong tim thay ma phong de dat lich");
         return;
       }
 
       setBookingLoading(true);
-      await api.createBooking(token, {
+
+      const bookingResponse = await api.createBooking(token, {
         roomId: bookingRoomId,
         visitDate: new Date().toISOString().slice(0, 10),
-        note: "Đặt lịch xem phòng từ mobile app"
+        note: "Dat lich xem phong tu mobile app"
       });
-      Alert.alert("Thành công", "Đã tạo lịch hẹn xem phòng");
+
+      const bookingId = bookingResponse?.data?._id;
+      if (!bookingId) {
+        throw new Error("Khong tao duoc ma lich hen de thanh toan sandbox");
+      }
+
+      const paymentResponse = await api.payBookingSandbox(token, bookingId);
+      const transactionId = paymentResponse?.data?.paymentTransactionId || "SBX";
+
+      Alert.alert(
+        "Thanh cong",
+        `Da tao lich hen va thanh toan sandbox thanh cong.\nMa GD: ${transactionId}`
+      );
+
       navigation.navigate("MainTabs", {
         screen: "LichHen"
       });
     } catch (error) {
-      Alert.alert("Đặt lịch thất bại", error.message);
+      Alert.alert("Dat lich that bai", error.message);
     } finally {
       setBookingLoading(false);
     }
@@ -77,9 +91,9 @@ export default function RoomDetailScreen({ route, navigation }) {
         <Text style={styles.title}>{room.title}</Text>
         <Text style={styles.price}>{room.price.toLocaleString("vi-VN")} VND/thang</Text>
         <Text style={styles.address}>{room.address}</Text>
-        <Text style={styles.sectionTitle}>Mô tả</Text>
+        <Text style={styles.sectionTitle}>Mo ta</Text>
         <Text style={styles.description}>{room.description}</Text>
-        <Text style={styles.sectionTitle}>Tiện ích</Text>
+        <Text style={styles.sectionTitle}>Tien ich</Text>
         <View style={styles.facilityList}>
           {room.facilities.map((facility) => (
             <View key={facility} style={styles.facilityItem}>
@@ -87,10 +101,10 @@ export default function RoomDetailScreen({ route, navigation }) {
             </View>
           ))}
         </View>
-        <Text style={styles.sectionTitle}>Thông tin quản lý</Text>
-        <Text style={styles.info}>Người quản lý: {room.managerName}</Text>
-        <Text style={styles.info}>Số điện thoại: {room.managerPhone}</Text>
-        <AppButton label="Đặt lịch xem phòng" onPress={handleBooking} loading={bookingLoading} />
+        <Text style={styles.sectionTitle}>Thong tin quan ly</Text>
+        <Text style={styles.info}>Nguoi quan ly: {room.managerName}</Text>
+        <Text style={styles.info}>So dien thoai: {room.managerPhone}</Text>
+        <AppButton label="Dat lich va thanh toan sandbox" onPress={handleBooking} loading={bookingLoading} />
       </ScrollView>
     </ScreenContainer>
   );

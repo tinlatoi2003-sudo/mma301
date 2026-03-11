@@ -3,7 +3,8 @@ const {
   createBooking,
   getMyBookings,
   getAllBookings,
-  updateBookingStatus
+  updateBookingStatus,
+  payBookingSandbox
 } = require("../controllers/bookingController");
 const { authMiddleware, adminOnly } = require("../middleware/authMiddleware");
 
@@ -13,5 +14,6 @@ router.post("/", authMiddleware, createBooking);
 router.get("/mine", authMiddleware, getMyBookings);
 router.get("/", authMiddleware, adminOnly, getAllBookings);
 router.patch("/:id/status", authMiddleware, adminOnly, updateBookingStatus);
+router.post("/:id/pay-sandbox", authMiddleware, payBookingSandbox);
 
 module.exports = router;
