@@ -2,6 +2,7 @@ import React, { useCallback, useState } from "react";
 import { ActivityIndicator, Alert, FlatList, StyleSheet, Text, View } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import ScreenContainer from "../components/ScreenContainer";
+import AppButton from "../components/AppButton";
 import { useAuth } from "../context/AuthContext";
 import { api } from "../services/api";
 import { colors } from "../constants/theme";
@@ -10,6 +11,7 @@ export default function BookingScreen() {
   const { token, user } = useAuth();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [payingBookingId, setPayingBookingId] = useState(null);
 
   const loadBookings = async () => {
     try {
@@ -30,6 +32,20 @@ export default function BookingScreen() {
       loadBookings();
     }, [token])
   );
+
+  const handleSandboxPayment = async (bookingId) => {
+    try {
+      setPayingBookingId(bookingId);
+      const response = await api.payBookingSandbox(token, bookingId);
+      const transactionId = response?.data?.paymentTransactionId || "SBX";
+      Alert.alert("Thanh cong", `Thanh toan sandbox thanh cong.\nMa GD: ${transactionId}`);
+      await loadBookings();
+    } catch (error) {
+      Alert.alert("Thanh toan that bai", error.message);
+    } finally {
+      setPayingBookingId(null);
+    }
+  };
 
   if (loading) {
     return (
@@ -64,6 +80,15 @@ export default function BookingScreen() {
             </Text>
             {item.paymentTransactionId ? <Text style={styles.meta}>Ma GD: {item.paymentTransactionId}</Text> : null}
             <Text style={styles.note}>{item.note}</Text>
+            {user?.role !== "admin" && item.paymentStatus !== "paid" ? (
+              <View style={styles.payButtonWrap}>
+                <AppButton
+                  label={payingBookingId === item._id ? "Dang thanh toan..." : "Thanh toan sandbox"}
+                  onPress={() => handleSandboxPayment(item._id)}
+                  loading={payingBookingId === item._id}
+                />
+              </View>
+            ) : null}
           </View>
         )}
         ListEmptyComponent={
@@ -105,6 +130,9 @@ const styles = StyleSheet.create({
   note: {
     color: colors.muted,
     marginTop: 8
+  },
+  payButtonWrap: {
+    marginTop: 12
   },
   empty: {
     color: colors.muted

@@ -47,24 +47,12 @@ export default function RoomDetailScreen({ route, navigation }) {
 
       setBookingLoading(true);
 
-      const bookingResponse = await api.createBooking(token, {
+      await api.createBooking(token, {
         roomId: bookingRoomId,
         visitDate: new Date().toISOString().slice(0, 10),
         note: "Dat lich xem phong tu mobile app"
       });
-
-      const bookingId = bookingResponse?.data?._id;
-      if (!bookingId) {
-        throw new Error("Khong tao duoc ma lich hen de thanh toan sandbox");
-      }
-
-      const paymentResponse = await api.payBookingSandbox(token, bookingId);
-      const transactionId = paymentResponse?.data?.paymentTransactionId || "SBX";
-
-      Alert.alert(
-        "Thanh cong",
-        `Da tao lich hen va thanh toan sandbox thanh cong.\nMa GD: ${transactionId}`
-      );
+      Alert.alert("Thanh cong", "Da tao lich hen. Vao LichHen de thanh toan sandbox.");
 
       navigation.navigate("MainTabs", {
         screen: "LichHen"
@@ -104,7 +92,7 @@ export default function RoomDetailScreen({ route, navigation }) {
         <Text style={styles.sectionTitle}>Thong tin quan ly</Text>
         <Text style={styles.info}>Nguoi quan ly: {room.managerName}</Text>
         <Text style={styles.info}>So dien thoai: {room.managerPhone}</Text>
-        <AppButton label="Dat lich va thanh toan sandbox" onPress={handleBooking} loading={bookingLoading} />
+        <AppButton label="Dat lich xem phong" onPress={handleBooking} loading={bookingLoading} />
       </ScrollView>
     </ScreenContainer>
   );
