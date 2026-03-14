@@ -6,11 +6,21 @@ import { useAuth } from "../context/AuthContext";
 import { colors } from "../constants/theme";
 
 const summaryCards = [
-  { key: "totalRooms", label: "Tổng phòng" },
-  { key: "availableRooms", label: "Còn trống" },
-  { key: "totalBookings", label: "Lịch hẹn" },
-  { key: "pendingBookings", label: "Chờ duyệt" }
+  { key: "totalRooms", label: "Tong phong", type: "number" },
+  { key: "availableRooms", label: "Con trong", type: "number" },
+  { key: "totalBookings", label: "Lich hen", type: "number" },
+  { key: "pendingBookings", label: "Cho duyet", type: "number" },
+  { key: "totalRevenue", label: "Tong doanh thu", type: "currency", fullWidth: true },
+  { key: "revenue30Days", label: "Doanh thu 30 ngay", type: "currency", fullWidth: true }
 ];
+
+function formatCardValue(value, type) {
+  if (type === "currency") {
+    return `${(value || 0).toLocaleString("vi-VN")} VND`;
+  }
+
+  return String(value || 0);
+}
 
 export default function DashboardScreen({ navigation }) {
   const { token, user } = useAuth();
@@ -28,7 +38,7 @@ export default function DashboardScreen({ navigation }) {
         const response = await api.getDashboard(token);
         setSummary(response.data);
       } catch (error) {
-        Alert.alert("Không tải được dashboard", error.message);
+        Alert.alert("Khong tai duoc dashboard", error.message);
       } finally {
         setLoading(false);
       }
@@ -40,8 +50,8 @@ export default function DashboardScreen({ navigation }) {
   if (user?.role !== "admin") {
     return (
       <ScreenContainer>
-        <Text style={styles.heading}>Không có quyền truy cập</Text>
-        <Text style={styles.subtitle}>Chỉ tài khoản admin mới xem được thống kê.</Text>
+        <Text style={styles.heading}>Khong co quyen truy cap</Text>
+        <Text style={styles.subtitle}>Chi tai khoan admin moi xem duoc thong ke.</Text>
       </ScreenContainer>
     );
   }
@@ -56,20 +66,29 @@ export default function DashboardScreen({ navigation }) {
 
   return (
     <ScreenContainer>
-      <Text style={styles.heading}>Tổng quan hệ thống</Text>
-      <Text style={styles.subtitle}>Xin chào {user?.fullName}</Text>
+      <Text style={styles.heading}>Tong quan he thong</Text>
+      <Text style={styles.subtitle}>Xin chao {user?.fullName}</Text>
       <View style={styles.grid}>
         {summaryCards.map((item) => (
           <Pressable
             key={item.key}
-            style={styles.card}
+            style={[styles.card, item.fullWidth && styles.cardFullWidth]}
             onPress={() => {
-              if (user?.role === "admin" && item.key === "pendingBookings") {
+              if (item.key === "pendingBookings") {
                 navigation.navigate("PendingBookings");
               }
             }}
           >
-            <Text style={styles.cardValue}>{summary[item.key]}</Text>
+            <Text
+              style={[
+                styles.cardValue,
+                item.type === "currency" && styles.cardValueCurrency
+              ]}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+            >
+              {formatCardValue(summary[item.key], item.type)}
+            </Text>
             <Text style={styles.cardLabel}>{item.label}</Text>
           </Pressable>
         ))}
@@ -102,10 +121,16 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 18
   },
+  cardFullWidth: {
+    width: "100%"
+  },
   cardValue: {
     color: colors.primary,
     fontWeight: "800",
     fontSize: 28
+  },
+  cardValueCurrency: {
+    fontSize: 24
   },
   cardLabel: {
     marginTop: 8,
