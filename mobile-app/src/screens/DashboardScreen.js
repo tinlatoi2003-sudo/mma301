@@ -9,9 +9,7 @@ const summaryCards = [
   { key: "totalRooms", label: "Tong phong", type: "number" },
   { key: "availableRooms", label: "Con trong", type: "number" },
   { key: "totalBookings", label: "Lich hen", type: "number" },
-  { key: "pendingBookings", label: "Cho duyet", type: "number" },
-  { key: "totalRevenue", label: "Tong doanh thu", type: "currency", fullWidth: true },
-  { key: "revenue30Days", label: "Doanh thu 30 ngay", type: "currency", fullWidth: true }
+  { key: "pendingBookings", label: "Cho duyet", type: "number" }
 ];
 
 function formatCardValue(value, type) {
@@ -93,6 +91,15 @@ export default function DashboardScreen({ navigation }) {
           </Pressable>
         ))}
       </View>
+      <View style={styles.revenueCard}>
+        <Text style={styles.revenueTitle}>Doanh thu</Text>
+        <Text style={styles.revenueValue}>
+          Tong doanh thu: {formatCardValue(summary.totalRevenue, "currency")}
+        </Text>
+        <Text style={styles.revenueSubValue}>
+          30 ngay gan nhat: {formatCardValue(summary.revenue30Days, "currency")}
+        </Text>
+      </View>
     </ScreenContainer>
   );
 }
@@ -135,6 +142,30 @@ const styles = StyleSheet.create({
   cardLabel: {
     marginTop: 8,
     color: colors.secondary,
+    fontWeight: "600"
+  },
+  revenueCard: {
+    marginTop: 14,
+    backgroundColor: colors.card,
+    borderColor: colors.border,
+    borderWidth: 1,
+    borderRadius: 20,
+    padding: 18
+  },
+  revenueTitle: {
+    color: colors.secondary,
+    fontWeight: "700",
+    fontSize: 18
+  },
+  revenueValue: {
+    marginTop: 10,
+    color: colors.primary,
+    fontWeight: "800",
+    fontSize: 24
+  },
+  revenueSubValue: {
+    marginTop: 6,
+    color: colors.text,
     fontWeight: "600"
   }
 });
