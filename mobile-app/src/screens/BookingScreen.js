@@ -1,5 +1,14 @@
 import React, { useCallback, useState } from "react";
-import { ActivityIndicator, Alert, FlatList, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  Modal,
+  StyleSheet,
+  Text,
+  TextInput,
+  View
+} from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import ScreenContainer from "../components/ScreenContainer";
 import AppButton from "../components/AppButton";
@@ -12,6 +21,10 @@ export default function BookingScreen() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [payingBookingId, setPayingBookingId] = useState(null);
+  const [paymentModalVisible, setPaymentModalVisible] = useState(false);
+  const [targetBookingId, setTargetBookingId] = useState(null);
+  const [payerName, setPayerName] = useState("");
+  const [accountNumber, setAccountNumber] = useState("");
 
   const loadBookings = async () => {
     try {
@@ -33,11 +46,38 @@ export default function BookingScreen() {
     }, [token])
   );
 
-  const handleSandboxPayment = async (bookingId) => {
+  const openPaymentModal = (bookingId) => {
+    setTargetBookingId(bookingId);
+    setPayerName("");
+    setAccountNumber("");
+    setPaymentModalVisible(true);
+  };
+
+  const closePaymentModal = () => {
+    setPaymentModalVisible(false);
+    setTargetBookingId(null);
+    setPayerName("");
+    setAccountNumber("");
+  };
+
+  const handleSandboxPayment = async () => {
     try {
-      setPayingBookingId(bookingId);
-      const response = await api.payBookingSandbox(token, bookingId);
+      if (!targetBookingId) {
+        return;
+      }
+
+      if (!payerName.trim() || !accountNumber.trim()) {
+        Alert.alert("Thieu thong tin", "Vui long nhap ten nguoi thanh toan va so tai khoan.");
+        return;
+      }
+
+      setPayingBookingId(targetBookingId);
+      const response = await api.payBookingSandbox(token, targetBookingId, {
+        payerName: payerName.trim(),
+        accountNumber: accountNumber.trim()
+      });
       const transactionId = response?.data?.paymentTransactionId || "SBX";
+      closePaymentModal();
       Alert.alert("Thanh cong", `Thanh toan sandbox thanh cong.\nMa GD: ${transactionId}`);
       await loadBookings();
     } catch (error) {
@@ -79,12 +119,14 @@ export default function BookingScreen() {
               Thanh toan: {item.paymentStatus || "unpaid"} ({item.paymentMethod || "sandbox"})
             </Text>
             {item.paymentTransactionId ? <Text style={styles.meta}>Ma GD: {item.paymentTransactionId}</Text> : null}
+            {item.sandboxPayerName ? <Text style={styles.meta}>Nguoi thanh toan: {item.sandboxPayerName}</Text> : null}
+            {item.sandboxAccountMasked ? <Text style={styles.meta}>Tai khoan: {item.sandboxAccountMasked}</Text> : null}
             <Text style={styles.note}>{item.note}</Text>
             {user?.role !== "admin" && item.paymentStatus !== "paid" ? (
               <View style={styles.payButtonWrap}>
                 <AppButton
                   label={payingBookingId === item._id ? "Dang thanh toan..." : "Thanh toan sandbox"}
-                  onPress={() => handleSandboxPayment(item._id)}
+                  onPress={() => openPaymentModal(item._id)}
                   loading={payingBookingId === item._id}
                 />
               </View>
@@ -99,6 +141,48 @@ export default function BookingScreen() {
           </Text>
         }
       />
+
+      <Modal
+        visible={paymentModalVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={closePaymentModal}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalCard}>
+            <Text style={styles.modalTitle}>Nhap thong tin thanh toan sandbox</Text>
+            <TextInput
+              style={styles.input}
+              value={payerName}
+              onChangeText={setPayerName}
+              placeholder="Ten nguoi thanh toan"
+              placeholderTextColor={colors.muted}
+            />
+            <TextInput
+              style={styles.input}
+              value={accountNumber}
+              onChangeText={setAccountNumber}
+              placeholder="So tai khoan"
+              placeholderTextColor={colors.muted}
+              keyboardType="number-pad"
+            />
+            <View style={styles.modalButtons}>
+              <AppButton
+                label="Huy"
+                onPress={closePaymentModal}
+                variant="secondary"
+                style={styles.modalButton}
+              />
+              <AppButton
+                label={payingBookingId ? "Dang xu ly..." : "Xac nhan thanh toan"}
+                onPress={handleSandboxPayment}
+                loading={Boolean(payingBookingId)}
+                style={styles.modalButton}
+              />
+            </View>
+          </View>
+        </View>
+      </Modal>
     </ScreenContainer>
   );
 }
@@ -136,5 +220,40 @@ const styles = StyleSheet.create({
   },
   empty: {
     color: colors.muted
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.45)",
+    justifyContent: "center",
+    padding: 18
+  },
+  modalCard: {
+    backgroundColor: colors.white,
+    borderRadius: 16,
+    padding: 16
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: colors.secondary,
+    marginBottom: 12
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.card,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginBottom: 10,
+    color: colors.text
+  },
+  modalButtons: {
+    flexDirection: "row",
+    gap: 10,
+    marginTop: 6
+  },
+  modalButton: {
+    flex: 1
   }
 });

@@ -38,6 +38,14 @@ const bookingSchema = new mongoose.Schema(
       type: String,
       default: ""
     },
+    sandboxPayerName: {
+      type: String,
+      default: ""
+    },
+    sandboxAccountMasked: {
+      type: String,
+      default: ""
+    },
     paidAt: {
       type: Date,
       default: null

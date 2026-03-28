@@ -93,6 +93,12 @@ async function updateBookingStatus(req, res, next) {
 
 async function payBookingSandbox(req, res, next) {
   try {
+    const { payerName, accountNumber } = req.body;
+
+    if (!payerName || !payerName.trim() || !accountNumber || !accountNumber.trim()) {
+      throw createError(400, "payerName and accountNumber are required");
+    }
+
     const booking = await Booking.findById(req.params.id).populate("room");
 
     if (!booking) {
@@ -117,6 +123,8 @@ async function payBookingSandbox(req, res, next) {
     booking.paymentStatus = "paid";
     booking.paymentMethod = "sandbox";
     booking.paymentTransactionId = transactionId;
+    booking.sandboxPayerName = payerName.trim();
+    booking.sandboxAccountMasked = accountNumber.trim().slice(-4).padStart(8, "*");
     booking.paidAt = new Date();
 
     if (booking.status === "pending") {
